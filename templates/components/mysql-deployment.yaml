@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysqldb
+  labels:
+    db: mysql
+spec:
+  selector:
+    matchLabels:
+      db: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        db: mysql
+    spec:
+      containers:
+      - image: {{ .Values.mysql.image.name }}
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: password
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: database
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: username
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-user-password
+              key: password
+        ports:
+        - containerPort: {{ .Values.mysql.ports.port }}
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+        resources:
+          requests:
+           memory: {{ .Values.mysql.resources.requests.memory }}
+           cpu: {{ .Values.mysql.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.mysql.resources.limits.memory }}
+            cpu: {{ .Values.mysql.resources.limits.cpu }}
+      nodeSelector:
+        kubernetes.io/hostname: {{ .Values.mysql.nodeSelector.hostname }}
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-persistent-volume-claim

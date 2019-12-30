@@ -1,0 +1,4 @@
+name: mysql
+version: 5.6
+appVersion: 3.0.0
+description: MySql Database

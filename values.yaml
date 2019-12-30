@@ -1,0 +1,15 @@
+mysql:
+  image:
+    name: mysql
+  ports:
+    port: 3306
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1
+  nodeSelector:
+    hostname: awskubernetes
+  hostPath: "/home/kairos/grv/techdoc/mysql/data/"
